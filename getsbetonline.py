@@ -8,7 +8,7 @@ def get_token():
   request = request.replace("'", "")
   return request
 
-## get league ids ##
+
 path_leagues = '/getsbet/sportscontent/sportsbook/v1/Leagues/GetBySportId'
 path_games = '/getsbet/sportscontent/sportsbook/v1/Events/GetByLeagueId'
 path_markets = '/getsbet/sportscontent/sportsbook/v1/Events/GetByEventId'
@@ -35,6 +35,8 @@ headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36'
     
 }
+
+## get league ids ##
 headers['path']=path_leagues
 payload_leagues = {"ids":["1"],"regionIds":["185"]}
 response = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Leagues/GetBySportId", data=json.dumps(payload_leagues), headers=headers)
