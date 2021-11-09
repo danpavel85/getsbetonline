@@ -1,16 +1,26 @@
 import json
 import requests
 
+## get token ##
+def get_token():
+  request = requests.get('https://api.play-gaming.com/authentication/v1/api/GetTokenBySiteId/158').text
+  request = request.replace("ApiAccessToken = '", "Bearer ")
+  request = request.replace("'", "")
+  return request
+
 ## get league ids ##
-headers1 = {
+path_leagues = '/getsbet/sportscontent/sportsbook/v1/Leagues/GetBySportId'
+path_games = '/getsbet/sportscontent/sportsbook/v1/Events/GetByLeagueId'
+path_markets = '/getsbet/sportscontent/sportsbook/v1/Events/GetByEventId'
+headers = {
     'authority': 'sbapi.sbtech.com',
     'method': 'POST',
-    'path': '/getsbet/sportscontent/sportsbook/v1/Leagues/GetBySportId',
+    'path': '',
     'scheme': 'https',
     'accept': '*/*',
     'accept-encoding': 'gzip, deflate, br',
     'accept-language': 'en-US,en;q=0.9',
-    'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTaXRlSWQiOjE1OCwiU2Vzc2lvbklkIjoiNTlhYjFlYTktZmJkZC00MDY0LWEyNDUtMzQ4OTZlYzg4YmEzIiwibmJmIjoxNjI4NjYyMzUwLCJleHAiOjE2MjkyNjcxODAsImlhdCI6MTYyODY2MjM4MH0.x6DegWLZoczIHN7uEy7FV0VkPIrzjzxa4lRc3PK1HcE',
+    'authorization': get_token(),
     'block-id': 'Center_TopLeaguesResponsiveBlock_32444',
     'content-length': '249',
     'content-type': 'application/json-patch+json',
@@ -25,10 +35,11 @@ headers1 = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36'
     
 }
-payload1 = {"ids":["1"],"regionIds":["185"]}
-r1 = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Leagues/GetBySportId", data=json.dumps(payload1), headers=headers1)
-# print(r1.status_code, r1.reason)
-json_data1 = json.loads(r1.text)
+headers['path']=path_leagues
+payload_leagues = {"ids":["1"],"regionIds":["185"]}
+response = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Leagues/GetBySportId", data=json.dumps(payload_leagues), headers=headers)
+# print(response.status_code, response.reason)
+json_data1 = json.loads(response.text)
 
 
 leagues_list = []
@@ -42,33 +53,10 @@ for x in leagues:
 ## get games ids ##
 games_id_list = []
 
-headers2 = {
-    'authority': 'sbapi.sbtech.com',
-    'method': 'POST',
-    'path': '/getsbet/sportscontent/sportsbook/v1/Events/GetByLeagueId',
-    'scheme': 'https',
-    'accept': '*/*',
-    'accept-encoding': 'gzip, deflate, br',
-    'accept-language': 'en-US,en;q=0.9',
-    'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTaXRlSWQiOjE1OCwiU2Vzc2lvbklkIjoiNTlhYjFlYTktZmJkZC00MDY0LWEyNDUtMzQ4OTZlYzg4YmEzIiwibmJmIjoxNjI4NjYyMzUwLCJleHAiOjE2MjkyNjcxODAsImlhdCI6MTYyODY2MjM4MH0.x6DegWLZoczIHN7uEy7FV0VkPIrzjzxa4lRc3PK1HcE',
-    'block-id': 'Center_TopLeaguesResponsiveBlock_32444',
-    'content-length': '249',
-    'content-type': 'application/json-patch+json',
-    'locale': 'ro',
-    'origin': 'https://online.getsbet.ro',
-    'referer': 'https://online.getsbet.ro/',
-    'sec-ch-ua': '"Chromium";v="92", " Not A;Brand";v="99", "Google Chrome";v="92"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-fetch-dest': '',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'cross-site',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36'
-    
-}
-
 for x in leagues_list:
-  payload2 = {"eventState":"Mixed","eventTypes":["Fixture","AggregateFixture"],"ids":[x],"regionIds":["185"]}
-  r2 = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Events/GetByLeagueId", data=json.dumps(payload2), headers=headers2)
+  headers['path']=path_games
+  payload_games = {"eventState":"Mixed","eventTypes":["Fixture","AggregateFixture"],"ids":[x],"regionIds":["185"]}
+  r2 = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Events/GetByLeagueId", data=json.dumps(payload_games), headers=headers)
   json_data2 = json.loads(r2.text)
   
   events = json_data2.get('events')
@@ -79,36 +67,13 @@ for x in leagues_list:
 
 ## get game markets ##
 
-headers3 = {
-    'authority': 'sbapi.sbtech.com',
-    'method': 'POST',
-    'path': '/getsbet/sportscontent/sportsbook/v1/Events/GetByEventId',
-    'scheme': 'https',
-    'accept': '*/*',
-    'accept-encoding': 'gzip, deflate, br',
-    'accept-language': 'en-US,en;q=0.9',
-    'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTaXRlSWQiOjE1OCwiU2Vzc2lvbklkIjoiNTlhYjFlYTktZmJkZC00MDY0LWEyNDUtMzQ4OTZlYzg4YmEzIiwibmJmIjoxNjI4NjYyMzUwLCJleHAiOjE2MjkyNjcxODAsImlhdCI6MTYyODY2MjM4MH0.x6DegWLZoczIHN7uEy7FV0VkPIrzjzxa4lRc3PK1HcE',
-    'block-id': 'Center_TopLeaguesResponsiveBlock_32444',
-    'content-length': '249',
-    'content-type': 'application/json-patch+json',
-    'locale': 'ro',
-    'origin': 'https://online.getsbet.ro',
-    'referer': 'https://online.getsbet.ro/',
-    'sec-ch-ua': '"Chromium";v="92", " Not A;Brand";v="99", "Google Chrome";v="92"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-fetch-dest': '',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'cross-site',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36'
-    
-}
-
 outcome_list = []
 odds_list = []
 
 for x in games_id_list:
-  payload3 = {"ids":[x],"marketIds":["1_58224924", "3_58253871"]}
-  r3 = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Events/GetByEventId", data=json.dumps(payload3), headers=headers3)
+  headers['path']=path_games
+  payload_markets = {"ids":[x],"marketIds":["1_58224924", "3_58253871"]}
+  r3 = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Events/GetByEventId", data=json.dumps(payload_markets), headers=headers)
 
   json_data3 = json.loads(r3.text)
   
