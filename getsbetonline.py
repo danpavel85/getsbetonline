@@ -39,11 +39,11 @@ headers['path']=path_leagues
 payload_leagues = {"ids":["1"],"regionIds":["185"]}
 response = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Leagues/GetBySportId", data=json.dumps(payload_leagues), headers=headers)
 # print(response.status_code, response.reason)
-json_data1 = json.loads(response.text)
+json_data = json.loads(response.text)
 
 
 leagues_list = []
-leagues = json_data1.get('leagues')
+leagues = json_data.get('leagues')
 for x in leagues:
   league_id = x.get('id')
   leagues_list.append(league_id)
@@ -56,10 +56,10 @@ games_id_list = []
 for x in leagues_list:
   headers['path']=path_games
   payload_games = {"eventState":"Mixed","eventTypes":["Fixture","AggregateFixture"],"ids":[x],"regionIds":["185"]}
-  r2 = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Events/GetByLeagueId", data=json.dumps(payload_games), headers=headers)
-  json_data2 = json.loads(r2.text)
+  response = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Events/GetByLeagueId", data=json.dumps(payload_games), headers=headers)
+  json_data = json.loads(response.text)
   
-  events = json_data2.get('events')
+  events = json_data.get('events')
   for x in events:
     id = x.get('id')
     games_id_list.append(id)
@@ -73,13 +73,13 @@ odds_list = []
 for x in games_id_list:
   headers['path']=path_games
   payload_markets = {"ids":[x],"marketIds":["1_58224924", "3_58253871"]}
-  r3 = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Events/GetByEventId", data=json.dumps(payload_markets), headers=headers)
+  response = requests.post("https://sbapi.sbtech.com/getsbet/sportscontent/sportsbook/v1/Events/GetByEventId", data=json.dumps(payload_markets), headers=headers)
 
-  json_data3 = json.loads(r3.text)
+  json_data = json.loads(response.text)
   
-  game = json_data3.get('events')[0].get('eventName')
+  game = json_data.get('events')[0].get('eventName')
   
-  markets = json_data3.get('markets')
+  markets = json_data.get('markets')
 
   
   for x in markets:
